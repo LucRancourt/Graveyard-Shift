@@ -9,6 +9,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 
+#include "PickupBaseComponent.h"
+
 #include "MyBaseFirstPersonCharacter.generated.h"
 
 
@@ -42,6 +44,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Actions")
 	UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Actions")
+	UInputAction* InteractAction;
+
 
 	// Camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
@@ -79,4 +85,16 @@ public:
 
 		// Used to override Parent Jump functionality if desired
 	virtual void Jump() override;
+
+	UFUNCTION()
+	void Interact();
+
+
+
+
+	UPROPERTY()
+	UPickupBaseComponent* HeldItem;
+
+	UPROPERTY()
+	UPickupBaseComponent* PickupAhead;
 };

@@ -4,6 +4,7 @@
 #include "MyBaseFirstPersonCharacter.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "PickupBaseComponent.h"
 
 
 // Sets default values
@@ -30,7 +31,7 @@ AMyBaseFirstPersonCharacter::AMyBaseFirstPersonCharacter()
 void AMyBaseFirstPersonCharacter::BeginPlay()
 {
     check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Updated"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("colors"));
 
 
     Super::BeginPlay();
@@ -50,6 +51,50 @@ void AMyBaseFirstPersonCharacter::BeginPlay()
 void AMyBaseFirstPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+
+
+
+    FVector Start = FPCameraComponent->GetComponentLocation();
+    FVector Forward = FPCameraComponent->GetForwardVector();
+    FVector End = Start + Forward * 1000.0f;
+
+    FHitResult HitResult;
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(this);
+
+    bool bHit = GetWorld()->LineTraceSingleByChannel(
+        HitResult,
+        Start,
+        End,
+        ECC_Visibility,
+        Params
+    );
+
+    if (bHit)
+    {
+        AActor* HitActor = HitResult.GetActor();
+        UPickupBaseComponent* Pickup = HitActor->FindComponentByClass<UPickupBaseComponent>();
+
+        if (PickupAhead != nullptr)
+        {
+            PickupAhead->Highlight(false);
+            PickupAhead = nullptr;
+        }
+
+        if (Pickup)
+        {
+            PickupAhead = Pickup;
+            PickupAhead->Highlight(true);
+        }
+    }
+    else
+    {
+        if (PickupAhead != nullptr)
+            PickupAhead->Highlight(false);
+
+        PickupAhead = nullptr;
+    }
 }
 
 // Called to bind functionality to input
@@ -75,6 +120,11 @@ void AMyBaseFirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* Pla
         {
             EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AMyBaseFirstPersonCharacter::StartJump);
             EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AMyBaseFirstPersonCharacter::StopJump);
+        }
+
+        if (InteractAction)
+        {
+            EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AMyBaseFirstPersonCharacter::Interact);
         }
     }
 }
@@ -139,4 +189,22 @@ void AMyBaseFirstPersonCharacter::Jump()
     if (Controller == nullptr) return;
 
     Super::Jump();
+}
+
+void AMyBaseFirstPersonCharacter::Interact()
+{
+    if (Controller == nullptr) return;
+
+    if (HeldItem != nullptr)
+    {
+        HeldItem->Throw();
+        HeldItem = nullptr;
+        return;
+    }
+
+    if (PickupAhead != nullptr)
+    {
+        HeldItem = PickupAhead;
+        HeldItem->Pickup(Cast<APlayerController>(Controller));
+    }
 }
