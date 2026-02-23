@@ -12,13 +12,25 @@ AMyBaseFirstPersonCharacter::AMyBaseFirstPersonCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+
+    // Create CameraComponent
+    FPCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+    check(FPCameraComponent != nullptr);
+
+    // Attach it to the CapsuleComponent
+    FPCameraComponent->SetupAttachment(CastChecked<USceneComponent, UCapsuleComponent>(GetCapsuleComponent()));
+    FPCameraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight));// ? Also where did BaseEyeHeight come from?
+
+    FPCameraComponent->bUsePawnControlRotation = true;
+
+    SetupMeshes();
 }
 
 // Called when the game starts or when spawned
 void AMyBaseFirstPersonCharacter::BeginPlay()
 {
     check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Moving"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Updated"));
 
 
     Super::BeginPlay();
@@ -68,6 +80,26 @@ void AMyBaseFirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* Pla
 }
 
 
+void AMyBaseFirstPersonCharacter::SetupMeshes()
+{
+    // Create MeshComponent
+    FPMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
+    check(FPMesh != nullptr);
+
+    FPMesh->SetOnlyOwnerSee(true); // FirstPersonMesh
+    FPMesh->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+
+    USkeletalMeshComponent* TPMesh = GetMesh(); // ThirdPersonMesh
+    TPMesh->SetOwnerNoSee(true);
+    TPMesh->CastShadow = true; // Ensures shadow is enabled
+    TPMesh->bCastHiddenShadow = true;
+    TPMesh->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
+
+    // Attack it to the CameraComponent
+    FPMesh->SetupAttachment(FPCameraComponent);
+}
+
+
 void AMyBaseFirstPersonCharacter::Move(const FInputActionValue& Value)
 {
     FVector2D MovementVector = Value.Get<FVector2D>();
@@ -76,7 +108,7 @@ void AMyBaseFirstPersonCharacter::Move(const FInputActionValue& Value)
     {
         // Get Rotation for Direction (YawRot)
         const FRotator Rotation = Controller->GetControlRotation();
-        const FRotator YawRotation(0, Rotation.Yaw, 0);
+        const FRotator YawRotation(0.0f, Rotation.Yaw, 0.0f);
 
         // Get Directions
         const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
@@ -100,7 +132,6 @@ void AMyBaseFirstPersonCharacter::Look(const FInputActionValue& Value)
 }
 
 void AMyBaseFirstPersonCharacter::StartJump() { bPressedJump = true; }
-
 void AMyBaseFirstPersonCharacter::StopJump() { bPressedJump = false; }
 
 void AMyBaseFirstPersonCharacter::Jump()

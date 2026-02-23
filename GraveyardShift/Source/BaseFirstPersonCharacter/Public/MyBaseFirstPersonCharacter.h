@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "InputActionValue.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+
 #include "MyBaseFirstPersonCharacter.generated.h"
 
 
@@ -30,14 +34,26 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputMappingContext* DefaultMappingContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Actions")
 	UInputAction* MoveAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Actions")
 	UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Actions")
 	UInputAction* JumpAction;
+
+	// Camera
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UCameraComponent* FPCameraComponent;
+
+	// FirstPerson Mesh (Arms) - only visible to Owning Player
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Mesh)
+	USkeletalMeshComponent* FPMesh;
+
+
+	UFUNCTION()
+	void SetupMeshes();
 
 
 public:	
