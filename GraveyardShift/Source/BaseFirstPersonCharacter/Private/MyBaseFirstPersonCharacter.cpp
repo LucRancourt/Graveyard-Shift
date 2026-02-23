@@ -2,6 +2,9 @@
 
 
 #include "MyBaseFirstPersonCharacter.h"
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
+
 
 // Sets default values
 AMyBaseFirstPersonCharacter::AMyBaseFirstPersonCharacter()
@@ -14,21 +17,95 @@ AMyBaseFirstPersonCharacter::AMyBaseFirstPersonCharacter()
 // Called when the game starts or when spawned
 void AMyBaseFirstPersonCharacter::BeginPlay()
 {
-	Super::BeginPlay();
-	
+    check(GEngine != nullptr);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Moving"));
+
+
+    Super::BeginPlay();
+
+
+    if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+        {
+            if (DefaultMappingContext)
+                Subsystem->AddMappingContext(DefaultMappingContext, 0);
+        }
+    }
 }
 
 // Called every frame
 void AMyBaseFirstPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
 void AMyBaseFirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+
+    // Bind Input Actions
+    if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+    {
+        if (MoveAction)
+        {
+            EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMyBaseFirstPersonCharacter::Move);
+        }
+
+        if (LookAction)
+        {
+            EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMyBaseFirstPersonCharacter::Look);
+        }
+
+        if (JumpAction)
+        {
+            EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AMyBaseFirstPersonCharacter::StartJump);
+            EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AMyBaseFirstPersonCharacter::StopJump);
+        }
+    }
 }
 
+
+void AMyBaseFirstPersonCharacter::Move(const FInputActionValue& Value)
+{
+    FVector2D MovementVector = Value.Get<FVector2D>();
+
+    if (Controller != nullptr)
+    {
+        // Get Rotation for Direction (YawRot)
+        const FRotator Rotation = Controller->GetControlRotation();
+        const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+        // Get Directions
+        const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+        const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+        // Add Movement based on Input
+        AddMovementInput(ForwardDirection, MovementVector.Y);
+        AddMovementInput(RightDirection, MovementVector.X);
+    }
+}
+
+void AMyBaseFirstPersonCharacter::Look(const FInputActionValue& Value)
+{
+    FVector2D LookVector = Value.Get<FVector2D>();
+
+    if (Controller != nullptr)
+    {
+        AddControllerYawInput(LookVector.X);
+        AddControllerPitchInput(LookVector.Y);
+    }
+}
+
+void AMyBaseFirstPersonCharacter::StartJump() { bPressedJump = true; }
+
+void AMyBaseFirstPersonCharacter::StopJump() { bPressedJump = false; }
+
+void AMyBaseFirstPersonCharacter::Jump()
+{
+    if (Controller == nullptr) return;
+
+    Super::Jump();
+}
