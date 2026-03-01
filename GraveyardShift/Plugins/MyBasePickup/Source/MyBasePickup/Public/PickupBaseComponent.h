@@ -4,11 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
+#include "InteractableComponent.h"
+
 #include "PickupBaseComponent.generated.h"
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class MYBASEPICKUP_API UPickupBaseComponent : public UActorComponent
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+class MYBASEPICKUP_API UPickupBaseComponent : public UInteractableComponent
 {
 	GENERATED_BODY()
 
@@ -29,28 +32,20 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void Interact_Implementation(AActor* Interactor);
+	bool CanInteract_Implementation(AActor* Interactor) const;
+
 	UFUNCTION()
-	void Pickup(APlayerController* Player);
+	void Pickup(UCameraComponent* PlayerCamera);
 
 	UFUNCTION()
 	void Respawn();
 
 	UFUNCTION()
-	void Highlight(bool bValue);
-
-	UFUNCTION()
 	void Throw();
 	
 
-
-
 private:
-	UPROPERTY()
-	AActor* Owner;
-
-	UPROPERTY()
-	UMeshComponent* OwnerMesh;
-
 	UPROPERTY()
 	APlayerController* Holder;
 
@@ -59,15 +54,6 @@ private:
 
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	bool bIsEnabled = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UMaterialInterface* OutlineMaterial;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FColor HighlightColor = FColor::Yellow;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FVector HoldOffset = FVector(60.0f, 30.0f, -20.0f);
 

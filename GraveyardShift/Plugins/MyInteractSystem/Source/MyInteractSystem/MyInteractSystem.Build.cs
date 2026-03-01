@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class MyBasePickup : ModuleRules
+public class MyInteractSystem : ModuleRules
 {
-	public MyBasePickup(ReadOnlyTargetRules Target) : base(Target)
+	public MyInteractSystem(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -26,7 +26,6 @@ public class MyBasePickup : ModuleRules
 			new string[]
 			{
 				"Core",
-				"MyInteractSystem"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

@@ -3,24 +3,10 @@
 
 #include "PickupBaseComponent.h"
 #include <Camera/CameraComponent.h>
-#include <Components/PostProcessComponent.h>
 
 // Sets default values for this component's properties
 UPickupBaseComponent::UPickupBaseComponent()
 {
-	Owner = GetOwner();
-	if (!Owner) { bIsEnabled = false; }
-	else
-	{
-		OwnerMesh = Owner->FindComponentByClass<UMeshComponent>();
-		if (!OwnerMesh) { bIsEnabled = false; }
-	}
-
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = bIsEnabled;
-
-	SetActive(bIsEnabled);
 }
 
 
@@ -29,33 +15,10 @@ void UPickupBaseComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 	if (!bIsEnabled) return;
 
 	SpawnPosition = Owner->GetActorLocation();
-
-
-
-	UPostProcessComponent* PostProcessComp = NewObject<UPostProcessComponent>(this);
-	PostProcessComp->SetupAttachment(Owner->GetRootComponent());
-	PostProcessComp->RegisterComponent();
-
-	PostProcessComp->BlendRadius = 3000.f;   // sphere radius in unreal units
-	PostProcessComp->BlendWeight = 1.f;     // full effect inside radius
-
-	UMaterialInstanceDynamic* DynMat = UMaterialInstanceDynamic::Create(OutlineMaterial, this);
-	PostProcessComp->Settings.AddBlendable(DynMat, 1.f);
-
-
-
-
-	OwnerMesh->bRenderCustomDepth = true;
-	OwnerMesh->SetCustomDepthStencilValue(1);
-	Highlight(false);
-	
-	OwnerMesh->SetMobility(EComponentMobility::Movable);
-	OwnerMesh->SetSimulatePhysics(true);
-	OwnerMesh->SetLinearDamping(1.0f);
-	OwnerMesh->SetAngularDamping(1.0f);
 }
 
 
@@ -68,30 +31,52 @@ void UPickupBaseComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 }
 
 
-void UPickupBaseComponent::Pickup(APlayerController* Player)
+void UPickupBaseComponent::Interact_Implementation(AActor* Interactor)
 {
-	Holder = Player;
-	if (!Holder) { Reset(); return; }
+	if (Holder) { Throw(); return; }
 
-	APawn* Pawn = Holder->GetPawn();
+
+	APawn* Pawn = Cast<APawn>(Interactor);
 	if (!Pawn) { Reset(); return; }
+
+	Holder = Cast<APlayerController>(Pawn->GetController());
+	if (!Holder) { Reset(); return; }
 
 	UCameraComponent* Camera = Pawn->FindComponentByClass<UCameraComponent>();
 	if (!Camera) { Reset(); return; }
 
+	Pickup(Camera);
+}
+
+bool UPickupBaseComponent::CanInteract_Implementation(AActor* Interactor) const
+{
+	if (!Interactor || !bIsEnabled) return false;
+
+	APawn* Pawn = Cast<APawn>(Interactor);
+	if (!Pawn) return false;
+
+	APlayerController* PlayerController = Cast<APlayerController>(Pawn->GetController());
+	if (!PlayerController) return false;
+
+	return true;
+}
+
+
+void UPickupBaseComponent::Pickup(UCameraComponent* InteractorCamera)
+{
 	OwnerMesh->SetSimulatePhysics(false);
 	OwnerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Owner->AttachToComponent(Camera, FAttachmentTransformRules::KeepRelativeTransform);
+	Owner->AttachToComponent(InteractorCamera, FAttachmentTransformRules::KeepRelativeTransform);
 	Owner->SetActorRelativeLocation(HoldOffset);
 
-	Highlight(false);
+	Highlight_Implementation(false);
 }
 
 void UPickupBaseComponent::Reset()
 {
 	Holder = nullptr;
 
-	Highlight(false);
+	Highlight_Implementation(false);
 	
 	Owner->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	OwnerMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -101,11 +86,6 @@ void UPickupBaseComponent::Reset()
 void UPickupBaseComponent::Respawn()
 {
 	Owner->SetActorLocation(SpawnPosition);
-}
-
-void UPickupBaseComponent::Highlight(bool bValue)
-{
-	OwnerMesh->SetRenderCustomDepth(bValue);
 }
 
 void UPickupBaseComponent::Throw()

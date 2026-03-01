@@ -45,6 +45,10 @@
 		{
 			"Name": "MyBasePickup",
 			"Enabled": true
+		},
+		{
+			"Name": "MyInteractSystem",
+			"Enabled": true
 		}
 	]
 }

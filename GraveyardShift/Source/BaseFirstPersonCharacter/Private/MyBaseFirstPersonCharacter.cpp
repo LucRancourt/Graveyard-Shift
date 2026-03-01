@@ -4,7 +4,6 @@
 #include "MyBaseFirstPersonCharacter.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-#include "PickupBaseComponent.h"
 
 
 // Sets default values
@@ -55,46 +54,7 @@ void AMyBaseFirstPersonCharacter::Tick(float DeltaTime)
 
 
 
-    FVector Start = FPCameraComponent->GetComponentLocation();
-    FVector Forward = FPCameraComponent->GetForwardVector();
-    FVector End = Start + Forward * 1000.0f;
-
-    FHitResult HitResult;
-    FCollisionQueryParams Params;
-    Params.AddIgnoredActor(this);
-
-    bool bHit = GetWorld()->LineTraceSingleByChannel(
-        HitResult,
-        Start,
-        End,
-        ECC_Visibility,
-        Params
-    );
-
-    if (bHit)
-    {
-        AActor* HitActor = HitResult.GetActor();
-        UPickupBaseComponent* Pickup = HitActor->FindComponentByClass<UPickupBaseComponent>();
-
-        if (PickupAhead != nullptr)
-        {
-            PickupAhead->Highlight(false);
-            PickupAhead = nullptr;
-        }
-
-        if (Pickup)
-        {
-            PickupAhead = Pickup;
-            PickupAhead->Highlight(true);
-        }
-    }
-    else
-    {
-        if (PickupAhead != nullptr)
-            PickupAhead->Highlight(false);
-
-        PickupAhead = nullptr;
-    }
+    
 }
 
 // Called to bind functionality to input
@@ -124,7 +84,7 @@ void AMyBaseFirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* Pla
 
         if (InteractAction)
         {
-            EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AMyBaseFirstPersonCharacter::Interact);
+            //EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AMyBaseFirstPersonCharacter::Interact);
         }
     }
 }
@@ -193,6 +153,7 @@ void AMyBaseFirstPersonCharacter::Jump()
 
 void AMyBaseFirstPersonCharacter::Interact()
 {
+    /*
     if (Controller == nullptr) return;
 
     if (HeldItem != nullptr)
@@ -207,4 +168,5 @@ void AMyBaseFirstPersonCharacter::Interact()
         HeldItem = PickupAhead;
         HeldItem->Pickup(Cast<APlayerController>(Controller));
     }
+    */
 }
