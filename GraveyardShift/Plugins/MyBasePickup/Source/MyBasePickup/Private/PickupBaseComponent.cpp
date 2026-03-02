@@ -19,6 +19,11 @@ void UPickupBaseComponent::BeginPlay()
 	if (!bIsEnabled) return;
 
 	SpawnPosition = Owner->GetActorLocation();
+	
+	OwnerMesh->SetMobility(EComponentMobility::Movable);
+	OwnerMesh->SetSimulatePhysics(true);
+	OwnerMesh->SetLinearDamping(1.0f);
+	OwnerMesh->SetAngularDamping(1.0f);
 }
 
 

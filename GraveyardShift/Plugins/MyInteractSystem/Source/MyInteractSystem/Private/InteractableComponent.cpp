@@ -30,11 +30,6 @@ void UInteractableComponent::BeginPlay()
 	if (!bIsEnabled) return;
 
 	SetupHighlight();
-
-	OwnerMesh->SetMobility(EComponentMobility::Movable);
-	OwnerMesh->SetSimulatePhysics(true);
-	OwnerMesh->SetLinearDamping(1.0f);
-	OwnerMesh->SetAngularDamping(1.0f);
 }
 
 // Called every frame

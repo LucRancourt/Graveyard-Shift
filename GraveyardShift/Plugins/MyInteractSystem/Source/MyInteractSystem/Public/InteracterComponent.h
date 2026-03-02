@@ -11,7 +11,7 @@
 #include "InteracterComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Interact), meta=(BlueprintSpawnableComponent) )
 class MYINTERACTSYSTEM_API UInteracterComponent : public UActorComponent
 {
 	GENERATED_BODY()

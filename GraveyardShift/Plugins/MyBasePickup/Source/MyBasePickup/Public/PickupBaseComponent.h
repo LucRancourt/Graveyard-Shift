@@ -10,7 +10,7 @@
 #include "PickupBaseComponent.generated.h"
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(Blueprintable, ClassGroup=(Pickup), meta=(BlueprintSpawnableComponent))
 class MYBASEPICKUP_API UPickupBaseComponent : public UInteractableComponent
 {
 	GENERATED_BODY()

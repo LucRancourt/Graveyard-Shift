@@ -66,22 +66,30 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
         if (ActiveInteractable)
             IMyInteractableInterface::Execute_Highlight(ActiveInteractable.GetObject(), false);
         
-        TArray<UActorComponent*> Components = HitActor->GetComponents().Array();
-        for (UActorComponent* Comp : Components)
+        if (HitActor->GetClass()->ImplementsInterface(UMyInteractableInterface::StaticClass()))
         {
-            if (Comp->GetClass()->ImplementsInterface(UMyInteractableInterface::StaticClass()))
+            ActiveInteractable.SetObject(HitActor);
+            ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(HitActor));
+        }
+        else
+        {
+            TArray<UActorComponent*> Components = HitActor->GetComponents().Array();
+            for (UActorComponent* Comp : Components)
             {
-                IMyInteractableInterface* Interface = Cast<IMyInteractableInterface>(Comp);
-                if (Interface)
+                if (Comp->GetClass()->ImplementsInterface(UMyInteractableInterface::StaticClass()))
                 {
-                    ActiveInteractable.SetObject(Comp);
-                    ActiveInteractable.SetInterface(Interface);
-                    break;
+                    IMyInteractableInterface* Interface = Cast<IMyInteractableInterface>(Comp);
+                    if (Interface)
+                    {
+                        ActiveInteractable.SetObject(Comp);
+                        ActiveInteractable.SetInterface(Interface);
+                        break;
+                    }
                 }
-            }
-            else
-            {
-                ActiveInteractable = nullptr;
+                else
+                {
+                    ActiveInteractable = nullptr;
+                }
             }
         }
 
@@ -95,12 +103,6 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
         ActiveInteractable = nullptr;
     }
-    GEngine->AddOnScreenDebugMessage(
-        -1,         // Key for the message (use -1 for a unique key)
-        5.0f,       // Duration to display (seconds)
-        FColor::Blue,// Display color
-        TEXT("Okay") // The message
-    );
 }
 
 void UInteracterComponent::TryInteract()
