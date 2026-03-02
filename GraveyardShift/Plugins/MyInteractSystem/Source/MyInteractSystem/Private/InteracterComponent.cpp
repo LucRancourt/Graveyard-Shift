@@ -68,6 +68,7 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
         ActiveInteractable = nullptr;
         
+
         if (HitActor->Implements<UMyInteractableInterface>())
         {
             if (IMyInteractableInterface::Execute_CanInteract(HitActor, GetOwner()))
