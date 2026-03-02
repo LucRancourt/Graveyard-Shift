@@ -65,30 +65,30 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
         if (ActiveInteractable)
             IMyInteractableInterface::Execute_Highlight(ActiveInteractable.GetObject(), false);
+
+        ActiveInteractable = nullptr;
         
-        if (HitActor->GetClass()->ImplementsInterface(UMyInteractableInterface::StaticClass()))
+        if (HitActor->Implements<UMyInteractableInterface>())
         {
-            ActiveInteractable.SetObject(HitActor);
-            ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(HitActor));
+            if (IMyInteractableInterface::Execute_CanInteract(HitActor, GetOwner()))
+            {
+                ActiveInteractable.SetObject(HitActor);
+                ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(HitActor));
+            }
         }
         else
         {
             TArray<UActorComponent*> Components = HitActor->GetComponents().Array();
             for (UActorComponent* Comp : Components)
             {
-                if (Comp->GetClass()->ImplementsInterface(UMyInteractableInterface::StaticClass()))
+                if (!Comp->Implements<UMyInteractableInterface>())
+                    continue;
+               
+                if (IMyInteractableInterface::Execute_CanInteract(Comp, GetOwner()))
                 {
-                    IMyInteractableInterface* Interface = Cast<IMyInteractableInterface>(Comp);
-                    if (Interface)
-                    {
-                        ActiveInteractable.SetObject(Comp);
-                        ActiveInteractable.SetInterface(Interface);
-                        break;
-                    }
-                }
-                else
-                {
-                    ActiveInteractable = nullptr;
+                    ActiveInteractable.SetObject(Comp);
+                    ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(Comp));
+                    break;
                 }
             }
         }
