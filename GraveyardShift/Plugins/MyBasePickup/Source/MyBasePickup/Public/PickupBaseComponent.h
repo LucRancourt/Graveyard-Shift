@@ -34,6 +34,8 @@ public:
 
 	void Interact_Implementation(AActor* Interactor);
 	bool CanInteract_Implementation(AActor* Interactor) const;
+	bool IsDoubleInteract_Implementation() const;
+
 
 	UFUNCTION()
 	void Pickup(UCameraComponent* PlayerCamera);

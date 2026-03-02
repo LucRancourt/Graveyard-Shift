@@ -22,8 +22,7 @@ class MYINTERACTSYSTEM_API IMyInteractableInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Interaction")
-	void SetupHighlight();
+	virtual void SetupHighlight() = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Interaction")
 	void Highlight(bool bValue);
@@ -33,4 +32,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Interaction")
 	bool CanInteract(AActor* Interactor) const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Interaction")
+	bool IsDoubleInteract() const;
 };

@@ -113,8 +113,11 @@ void UInteracterComponent::TryInteract()
 
         if (Owner)
             if (IMyInteractableInterface::Execute_CanInteract(Object, Owner))
+            {
                 IMyInteractableInterface::Execute_Interact(Object, Owner);
 
-        bIsInUse = !bIsInUse;
+                if (IMyInteractableInterface::Execute_IsDoubleInteract(Object))
+                    bIsInUse = !bIsInUse;
+            }
     }
 }

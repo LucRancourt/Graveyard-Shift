@@ -66,6 +66,11 @@ bool UPickupBaseComponent::CanInteract_Implementation(AActor* Interactor) const
 	return true;
 }
 
+bool UPickupBaseComponent::IsDoubleInteract_Implementation() const
+{
+	return true;
+}
+
 
 void UPickupBaseComponent::Pickup(UCameraComponent* InteractorCamera)
 {

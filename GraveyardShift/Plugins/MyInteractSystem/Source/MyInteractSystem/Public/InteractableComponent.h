@@ -23,7 +23,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	void SetupHighlight();
+	virtual void SetupHighlight() override;
 
 public:	
 	// Called every frame
