@@ -43,12 +43,6 @@ void AInteractableActor::SetupHighlight()
 {
 	if (!Mesh) return;
 
-	GEngine->AddOnScreenDebugMessage(
-		-1,                // Key (use -1 for new message)
-		5.f,               // Time in seconds
-		FColor::Green,     // Text color
-		TEXT("Hello World")
-	);
 	Mesh->bRenderCustomDepth = true;
 	Mesh->SetCustomDepthStencilValue(1);
 	Highlight_Implementation(false);

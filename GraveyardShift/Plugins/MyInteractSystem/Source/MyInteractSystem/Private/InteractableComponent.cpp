@@ -6,6 +6,19 @@
 // Sets default values for this component's properties
 UInteractableComponent::UInteractableComponent()
 {
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
+	PrimaryComponentTick.bCanEverTick = true;
+}
+
+// Called when the game starts
+void UInteractableComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+
+	if (!bIsEnabled) return;
+
 	Owner = GetOwner();
 	if (!Owner) { bIsEnabled = false; }
 	else
@@ -14,18 +27,9 @@ UInteractableComponent::UInteractableComponent()
 		if (!OwnerMesh) { bIsEnabled = false; }
 	}
 
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = bIsEnabled;
 
 	SetActive(bIsEnabled);
-}
-
-// Called when the game starts
-void UInteractableComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
 
 	if (!bIsEnabled) return;
 
