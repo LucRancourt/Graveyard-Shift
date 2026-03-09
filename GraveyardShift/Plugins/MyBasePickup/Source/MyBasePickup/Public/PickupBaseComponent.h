@@ -54,10 +54,16 @@ private:
 	UPROPERTY()
 	FVector SpawnPosition;
 
+	UPROPERTY()
+	FVector InitialScale;
+
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FVector HoldOffset = FVector(60.0f, 30.0f, -20.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ScaleAdjustment = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float ThrowForce = 1000.0f;

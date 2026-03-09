@@ -19,6 +19,7 @@ void UPickupBaseComponent::BeginPlay()
 	if (!bIsEnabled) return;
 
 	SpawnPosition = Owner->GetActorLocation();
+	InitialScale = Owner->GetActorScale();
 	
 	OwnerMesh->SetMobility(EComponentMobility::Movable);
 	OwnerMesh->SetSimulatePhysics(true);
@@ -77,6 +78,7 @@ void UPickupBaseComponent::Pickup(UCameraComponent* InteractorCamera)
 	OwnerMesh->SetSimulatePhysics(false);
 	OwnerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Owner->AttachToComponent(InteractorCamera, FAttachmentTransformRules::KeepRelativeTransform);
+	Owner->SetActorRelativeScale3D(InitialScale * ScaleAdjustment);
 	Owner->SetActorRelativeLocation(HoldOffset);
 
 	Highlight_Implementation(false);
@@ -89,6 +91,7 @@ void UPickupBaseComponent::Reset()
 	Highlight_Implementation(false);
 	
 	Owner->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	Owner->SetActorRelativeScale3D(InitialScale);
 	OwnerMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	OwnerMesh->SetSimulatePhysics(true);
 }
