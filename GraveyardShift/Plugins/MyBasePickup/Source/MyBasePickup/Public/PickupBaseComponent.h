@@ -40,11 +40,14 @@ public:
 	UFUNCTION()
 	void Pickup(UCameraComponent* PlayerCamera);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void Respawn();
-
+	
 	UFUNCTION()
 	void Throw();
+
+	UFUNCTION(BlueprintGetter)
+	bool GetIsHeld() const { return bIsHeld; }
 	
 
 private:
@@ -67,4 +70,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float ThrowForce = 1000.0f;
+
+	UPROPERTY(BlueprintGetter=GetIsHeld)
+	bool bIsHeld = false;
 };

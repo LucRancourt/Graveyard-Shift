@@ -82,6 +82,8 @@ void UPickupBaseComponent::Pickup(UCameraComponent* InteractorCamera)
 	Owner->SetActorRelativeLocation(HoldOffset);
 
 	Highlight_Implementation(false);
+
+	bIsHeld = true;
 }
 
 void UPickupBaseComponent::Reset()
@@ -94,6 +96,8 @@ void UPickupBaseComponent::Reset()
 	Owner->SetActorRelativeScale3D(InitialScale);
 	OwnerMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	OwnerMesh->SetSimulatePhysics(true);
+
+	bIsHeld = false;
 }
 
 void UPickupBaseComponent::Respawn()
