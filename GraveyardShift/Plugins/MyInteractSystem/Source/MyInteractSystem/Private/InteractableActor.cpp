@@ -16,7 +16,7 @@ void AInteractableActor::BeginPlay()
 	Super::BeginPlay();
 	
 
-	Mesh = this->FindComponentByClass<UStaticMeshComponent>();
+	Mesh = this->FindComponentByClass<UMeshComponent>();
 
 	if (!Mesh)
 	{
