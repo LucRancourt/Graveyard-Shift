@@ -18,7 +18,7 @@ class UInputMappingContext;
 class UInputAction;
 
 
-UCLASS()
+UCLASS(Blueprintable)
 class BASEFIRSTPERSONCHARACTER_API AMyBaseFirstPersonCharacter : public ACharacter
 {
 	GENERATED_BODY()

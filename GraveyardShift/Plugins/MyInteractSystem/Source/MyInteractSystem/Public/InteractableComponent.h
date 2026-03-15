@@ -31,6 +31,13 @@ public:
 
 	void Highlight_Implementation(bool bValue);
 
+	bool CanInteract_Implementation(AActor* Interactor) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Interact")
+	void SetIsEnabled(bool bEnabled);
+
+	void SetupInteractableValues();
+
 
 protected:
 	UPROPERTY()
@@ -40,6 +47,9 @@ protected:
 	UStaticMeshComponent* OwnerMesh;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere)
 	bool bIsEnabled = true;
+
+	UPROPERTY(EditAnywhere)
+	int CustomDepthStencilValue = 1;
 };

@@ -20,17 +20,11 @@ void UPickupBaseComponent::BeginPlay()
 
 	SpawnPosition = Owner->GetActorLocation();
 	InitialScale = Owner->GetActorScale();
-	if (!OwnerMesh)
-	{
-		UE_LOG(LogTemp, Error, TEXT("OwnerMesh is null!"));
-		return;
-	}
-	/*
+
 	OwnerMesh->SetMobility(EComponentMobility::Movable);
 	OwnerMesh->SetSimulatePhysics(true);
 	OwnerMesh->SetLinearDamping(1.0f);
 	OwnerMesh->SetAngularDamping(1.0f);
-	*/
 }
 
 

@@ -69,7 +69,7 @@ protected:
 	float ScaleAdjustment = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float ThrowForce = 1000.0f;
+	float ThrowForce = 0.0f;
 
 	UPROPERTY(BlueprintGetter=GetIsHeld)
 	bool bIsHeld = false;

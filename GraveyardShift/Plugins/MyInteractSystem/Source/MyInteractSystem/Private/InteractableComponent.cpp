@@ -17,23 +17,7 @@ void UInteractableComponent::BeginPlay()
 	Super::BeginPlay();
 
 
-	if (!bIsEnabled) return;
-
-	Owner = GetOwner();
-	if (!Owner) { bIsEnabled = false; }
-	else
-	{
-		OwnerMesh = Owner->FindComponentByClass<UStaticMeshComponent>();
-		if (!OwnerMesh) { bIsEnabled = false; }
-	}
-
-	PrimaryComponentTick.bCanEverTick = bIsEnabled;
-
-	SetActive(bIsEnabled);
-
-	if (!bIsEnabled) return;
-
-	SetupHighlight();
+	SetupInteractableValues();
 }
 
 // Called every frame
@@ -48,11 +32,59 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 void UInteractableComponent::SetupHighlight()
 {
 	OwnerMesh->bRenderCustomDepth = true;
-	OwnerMesh->SetCustomDepthStencilValue(1);
+	OwnerMesh->SetCustomDepthStencilValue(CustomDepthStencilValue);
 	Highlight_Implementation(false);
 }
 
 void UInteractableComponent::Highlight_Implementation(bool bValue)
 {
 	OwnerMesh->SetRenderCustomDepth(bValue);
+}
+
+bool UInteractableComponent::CanInteract_Implementation(AActor* Interactor) const
+{
+	if (!bIsEnabled) return false;
+
+	return true;
+}
+
+void UInteractableComponent::SetIsEnabled(bool bEnabled)
+{
+	bIsEnabled = bEnabled;
+	SetupInteractableValues();
+}
+
+void UInteractableComponent::SetupInteractableValues()
+{
+	if (!bIsEnabled)
+	{
+		Owner = nullptr;
+
+		if (IsValid(OwnerMesh))
+		{
+			Highlight_Implementation(false);
+		}
+
+		OwnerMesh = nullptr;
+
+		PrimaryComponentTick.bCanEverTick = bIsEnabled;
+		SetActive(bIsEnabled);
+
+		return;
+	}
+
+	Owner = GetOwner();
+	if (!Owner) { bIsEnabled = false; }
+	else
+	{
+		OwnerMesh = Owner->FindComponentByClass<UStaticMeshComponent>();
+		if (!OwnerMesh) { bIsEnabled = false; }
+	}
+
+	PrimaryComponentTick.bCanEverTick = bIsEnabled;
+	SetActive(bIsEnabled);
+
+	if (!bIsEnabled) return;
+
+	SetupHighlight();
 }

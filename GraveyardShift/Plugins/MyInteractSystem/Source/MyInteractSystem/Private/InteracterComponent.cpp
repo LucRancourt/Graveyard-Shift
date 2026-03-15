@@ -41,7 +41,8 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 
-    if (ActiveInteractable && bIsInUse) return;
+    if (!IsValid(OwnerCamera) || !IsValid(Owner)) return;
+    if (IsValid(ActiveInteractable.GetObject()) && bIsInUse) return;
 
     FVector Start = OwnerCamera->GetComponentLocation();
     FVector Forward = OwnerCamera->GetForwardVector();
@@ -59,66 +60,72 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
         Params
     );
 
-    if (bHit)
-    {
-        AActor* HitActor = HitResult.GetActor();
 
-        if (ActiveInteractable)
+    if (IsValid(ActiveInteractable.GetObject()))
+    {
+        UObject* Object = ActiveInteractable.GetObject();
+        if (IsValid(Object))
+        {
             IMyInteractableInterface::Execute_Highlight(ActiveInteractable.GetObject(), false);
+        }
 
         ActiveInteractable = nullptr;
-        
-
-        if (HitActor->Implements<UMyInteractableInterface>())
-        {
-            if (IMyInteractableInterface::Execute_CanInteract(HitActor, GetOwner()))
-            {
-                ActiveInteractable.SetObject(HitActor);
-                ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(HitActor));
-            }
-        }
-        else
-        {
-            TArray<UActorComponent*> Components = HitActor->GetComponents().Array();
-            for (UActorComponent* Comp : Components)
-            {
-                if (!Comp->Implements<UMyInteractableInterface>())
-                    continue;
-               
-                if (IMyInteractableInterface::Execute_CanInteract(Comp, GetOwner()))
-                {
-                    ActiveInteractable.SetObject(Comp);
-                    ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(Comp));
-                    break;
-                }
-            }
-        }
-
-        if (ActiveInteractable)
-            IMyInteractableInterface::Execute_Highlight(ActiveInteractable.GetObject(), true);
     }
-    else
-    {
-        if (ActiveInteractable)
-            IMyInteractableInterface::Execute_Highlight(ActiveInteractable.GetObject(), false);
 
-        ActiveInteractable = nullptr;
+
+    if (!bHit) return;
+
+    AActor* HitActor = HitResult.GetActor();
+    if (!IsValid(HitActor)) return;
+
+
+    if (HitActor->Implements<UMyInteractableInterface>())
+    {
+        if (IMyInteractableInterface::Execute_CanInteract(HitActor, Owner))
+        {
+            ActiveInteractable.SetObject(HitActor);
+            IMyInteractableInterface::Execute_Highlight(HitActor, true);
+            return;
+        }
+    }
+
+    for (UActorComponent* Comp : HitActor->GetComponents())
+    {
+        if (!Comp) continue;
+        if (!Comp->Implements<UMyInteractableInterface>()) continue;
+
+        if (IMyInteractableInterface::Execute_CanInteract(Comp, Owner))
+        {
+            ActiveInteractable.SetObject(Comp);
+            IMyInteractableInterface::Execute_Highlight(Comp, true);
+            break;
+        }
     }
 }
 
 void UInteracterComponent::TryInteract()
 {
-    if (ActiveInteractable)
+    if (!IsValid(ActiveInteractable.GetObject()))
     {
-        UObject* Object = ActiveInteractable.GetObject();
+        ActiveInteractable = nullptr;
+        return;
+    }
 
-        if (Owner)
-            if (IMyInteractableInterface::Execute_CanInteract(Object, Owner))
-            {
-                IMyInteractableInterface::Execute_Interact(Object, Owner);
+    UObject* Object = ActiveInteractable.GetObject();
+    if (!IsValid(Object))
+    {
+        ActiveInteractable = nullptr;
+        return;
+    }
 
-                if (IMyInteractableInterface::Execute_IsDoubleInteract(Object))
-                    bIsInUse = !bIsInUse;
-            }
+    if (IsValid(Owner))
+    {
+        if (IMyInteractableInterface::Execute_CanInteract(Object, Owner))
+        {
+            IMyInteractableInterface::Execute_Interact(Object, Owner);
+
+            if (IMyInteractableInterface::Execute_IsDoubleInteract(Object))
+                bIsInUse = !bIsInUse;
+        }
     }
 }
