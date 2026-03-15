@@ -23,7 +23,7 @@ void UInteractableComponent::BeginPlay()
 	if (!Owner) { bIsEnabled = false; }
 	else
 	{
-		OwnerMesh = Owner->FindComponentByClass<UMeshComponent>();
+		OwnerMesh = Owner->FindComponentByClass<UStaticMeshComponent>();
 		if (!OwnerMesh) { bIsEnabled = false; }
 	}
 
@@ -47,12 +47,6 @@ void UInteractableComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UInteractableComponent::SetupHighlight()
 {
-	Owner = GetOwner();
-	if (!Owner) return;
-
-	OwnerMesh = Owner->FindComponentByClass<UMeshComponent>();
-	if (!OwnerMesh) return;
-
 	OwnerMesh->bRenderCustomDepth = true;
 	OwnerMesh->SetCustomDepthStencilValue(1);
 	Highlight_Implementation(false);

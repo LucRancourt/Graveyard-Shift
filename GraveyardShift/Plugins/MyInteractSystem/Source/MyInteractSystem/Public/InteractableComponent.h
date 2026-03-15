@@ -37,7 +37,7 @@ protected:
 	AActor* Owner;
 
 	UPROPERTY()
-	UMeshComponent* OwnerMesh;
+	UStaticMeshComponent* OwnerMesh;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
