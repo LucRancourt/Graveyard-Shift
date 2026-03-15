@@ -30,7 +30,6 @@ AMyBaseFirstPersonCharacter::AMyBaseFirstPersonCharacter()
 void AMyBaseFirstPersonCharacter::BeginPlay()
 {
     check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("UpToDate"));
 
 
     Super::BeginPlay();
