@@ -47,5 +47,7 @@ void AInteractableActor::SetupHighlight()
 
 void AInteractableActor::Highlight_Implementation(bool bValue)
 {
+	if (!(IsValid(Mesh))) return;
+
 	Mesh->SetRenderCustomDepth(bValue);
 }

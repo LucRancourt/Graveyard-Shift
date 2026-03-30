@@ -38,6 +38,8 @@ void UInteractableComponent::SetupHighlight()
 
 void UInteractableComponent::Highlight_Implementation(bool bValue)
 {
+	if (!(IsValid(OwnerMesh))) return;
+
 	OwnerMesh->SetRenderCustomDepth(bValue);
 }
 

@@ -77,15 +77,21 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
     AActor* HitActor = HitResult.GetActor();
     if (!IsValid(HitActor)) return;
-
+    
+    if (!IsValid(Owner)) return;
 
     if (HitActor->Implements<UMyInteractableInterface>())
     {
         if (IMyInteractableInterface::Execute_CanInteract(HitActor, Owner))
         {
-            ActiveInteractable.SetObject(HitActor);
-            IMyInteractableInterface::Execute_Highlight(HitActor, true);
-            return;
+            if (HitActor->Implements<UMyInteractableInterface>())
+            {
+                ActiveInteractable.SetObject(HitActor);
+                ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(HitActor));
+
+                IMyInteractableInterface::Execute_Highlight(HitActor, true);
+                return;
+            }
         }
     }
 
@@ -97,6 +103,7 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
         if (IMyInteractableInterface::Execute_CanInteract(Comp, Owner))
         {
             ActiveInteractable.SetObject(Comp);
+            ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(Comp));
             IMyInteractableInterface::Execute_Highlight(Comp, true);
             break;
         }
