@@ -66,7 +66,8 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
         UObject* Object = ActiveInteractable.GetObject();
         if (IsValid(Object))
         {
-            IMyInteractableInterface::Execute_Highlight(ActiveInteractable.GetObject(), false);
+            if (Object->Implements<UMyInteractableInterface>())
+                IMyInteractableInterface::Execute_Highlight(Object, false);
         }
 
         ActiveInteractable = nullptr;
