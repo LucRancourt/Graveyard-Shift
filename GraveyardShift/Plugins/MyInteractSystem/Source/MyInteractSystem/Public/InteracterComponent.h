@@ -20,6 +20,10 @@ public:
 	// Sets default values for this component's properties
 	UInteracterComponent();
 
+
+private:
+	void ReEnable();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -30,6 +34,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Interaction")
 	void TryInteract();
+
+	UFUNCTION(BlueprintCallable, Category="Interaction")
+	void TempDisable(float Duration);
 
 		
 private:
@@ -43,6 +50,9 @@ private:
 	TScriptInterface<IMyInteractableInterface> ActiveInteractable;
 
 	bool bIsInUse = false;
+	bool bIsAllowedToTick = true;
+
+	FTimerHandle TimerHandle;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

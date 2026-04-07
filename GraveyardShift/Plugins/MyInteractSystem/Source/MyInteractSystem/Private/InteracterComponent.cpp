@@ -35,9 +35,29 @@ void UInteracterComponent::BeginPlay()
 }
 
 
+void UInteracterComponent::TempDisable(float Duration)
+{
+    bIsAllowedToTick = false;
+
+    GetWorld()->GetTimerManager().SetTimer(
+        TimerHandle,
+        this,
+        &UInteracterComponent::ReEnable,
+        Duration,
+        false
+    );
+}
+
+void UInteracterComponent::ReEnable()
+{
+    bIsAllowedToTick = true;
+}
+
 // Called every frame
 void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+    if (!bIsAllowedToTick) return;
+
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 
@@ -61,17 +81,16 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
     );
 
 
-    if (IsValid(ActiveInteractable.GetObject()))
+    if (IsValid(ActiveInteractable.GetObject()) && ActiveInteractable != nullptr)
     {
         UObject* Object = ActiveInteractable.GetObject();
-        if (IsValid(Object))
+        if (IsValid(Object) && Object->Implements<UMyInteractableInterface>())
         {
-            if (Object->Implements<UMyInteractableInterface>())
-                IMyInteractableInterface::Execute_Highlight(Object, false);
+            IMyInteractableInterface::Execute_Highlight(Object, false);
         }
-
-        ActiveInteractable = nullptr;
     }
+
+    ActiveInteractable = nullptr;
 
 
     if (!bHit) return;
@@ -81,16 +100,18 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
     
     if (!IsValid(Owner)) return;
 
+
     if (HitActor->Implements<UMyInteractableInterface>())
     {
         if (IMyInteractableInterface::Execute_CanInteract(HitActor, Owner))
         {
-            if (HitActor->Implements<UMyInteractableInterface>())
+            if (IsValid(HitActor) && HitActor->Implements<UMyInteractableInterface>())
             {
+                IMyInteractableInterface::Execute_Highlight(HitActor, true);
+
                 ActiveInteractable.SetObject(HitActor);
                 ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(HitActor));
 
-                IMyInteractableInterface::Execute_Highlight(HitActor, true);
                 return;
             }
         }
@@ -103,16 +124,23 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
         if (IMyInteractableInterface::Execute_CanInteract(Comp, Owner))
         {
-            ActiveInteractable.SetObject(Comp);
-            ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(Comp));
-            IMyInteractableInterface::Execute_Highlight(Comp, true);
-            break;
+            if (IsValid(Comp) && Comp->Implements<UMyInteractableInterface>())
+            {
+                IMyInteractableInterface::Execute_Highlight(Comp, true);
+
+                ActiveInteractable.SetObject(Comp);
+                ActiveInteractable.SetInterface(Cast<IMyInteractableInterface>(Comp));
+
+                break;
+            }
         }
     }
 }
 
 void UInteracterComponent::TryInteract()
 {
+    if (ActiveInteractable == nullptr) return;
+
     if (!IsValid(ActiveInteractable.GetObject()))
     {
         ActiveInteractable = nullptr;
