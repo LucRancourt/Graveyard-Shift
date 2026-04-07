@@ -161,11 +161,9 @@ void UInteracterComponent::TryInteract()
 
     if (IsValid(Owner))
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("wtf"));
         if (IMyInteractableInterface::Execute_CanInteract(Object, Owner))
         {
             IMyInteractableInterface::Execute_Interact(Object, Owner);
-            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"));
 
             if (IMyInteractableInterface::Execute_IsDoubleInteract(Object))
                 bIsInUse = !bIsInUse;

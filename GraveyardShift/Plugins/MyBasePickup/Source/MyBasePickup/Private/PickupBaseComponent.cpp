@@ -15,8 +15,6 @@ void UPickupBaseComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Hello World!"));
-
 	if (!bIsEnabled) return;
 
 	SpawnPosition = Owner->GetActorLocation();
@@ -89,7 +87,6 @@ void UPickupBaseComponent::Pickup(UCameraComponent* InteractorCamera)
 
 void UPickupBaseComponent::Reset()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Hewwwwwww"));
 	Holder = nullptr;
 
 	Highlight_Implementation(false);
@@ -109,7 +106,6 @@ void UPickupBaseComponent::Respawn()
 
 void UPickupBaseComponent::Throw()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Hello World!"));
 	if (Holder != nullptr)
 	{
 		FVector Direction = Holder->PlayerCameraManager->GetActorForwardVector();// (Owner->GetActorLocation() - Holder->PlayerCameraManager->GetCameraLocation()).GetSafeNormal();
