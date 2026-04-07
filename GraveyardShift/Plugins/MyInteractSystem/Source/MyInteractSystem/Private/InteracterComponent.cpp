@@ -90,6 +90,10 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
         }
     }
 
+
+
+    ActiveInteractable.SetObject(NULL);
+    ActiveInteractable.SetInterface(NULL);
     ActiveInteractable = nullptr;
 
 
@@ -139,6 +143,7 @@ void UInteracterComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UInteracterComponent::TryInteract()
 {
+    if (!bIsAllowedToTick) return;
     if (ActiveInteractable == nullptr) return;
 
     if (!IsValid(ActiveInteractable.GetObject()))
@@ -156,9 +161,11 @@ void UInteracterComponent::TryInteract()
 
     if (IsValid(Owner))
     {
+        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("wtf"));
         if (IMyInteractableInterface::Execute_CanInteract(Object, Owner))
         {
             IMyInteractableInterface::Execute_Interact(Object, Owner);
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"));
 
             if (IMyInteractableInterface::Execute_IsDoubleInteract(Object))
                 bIsInUse = !bIsInUse;
